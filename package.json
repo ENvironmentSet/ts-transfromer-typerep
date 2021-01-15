@@ -1,0 +1,26 @@
+{
+  "name": "ts-typerep",
+  "version": "0.0.0",
+  "description": "Bring your type level information into value level.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ENvironmentSet/ts-typeRep.git"
+  },
+  "keywords": [
+    "typescript",
+    "type-level",
+    "transformer"
+  ],
+  "author": "ENvironmentSet",
+  "bugs": {
+    "url": "https://github.com/ENvironmentSet/ts-typeRep/issues"
+  },
+  "homepage": "https://github.com/ENvironmentSet/ts-typeRep#readme",
+  "dependencies": {
+    "typescript": "^4.1.3"
+  }
+}
