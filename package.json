@@ -1,8 +1,9 @@
 {
-  "name": "ts-typeRep",
+  "name": "ts-typerep",
   "version": "0.0.0",
   "description": "Bring your type level information into value level.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },
