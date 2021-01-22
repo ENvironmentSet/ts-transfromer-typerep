@@ -15,7 +15,6 @@ export enum TypeKind {
   Never,
   Void,
   Enum,
-  this,
   Interface,
   Function,
   Union, //@TODO: variants
