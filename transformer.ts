@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { TypeKind } from './typeReps';
-import { compileValue, checkFlag } from './helper';
+import { encode, checkFlag } from './helper';
 import { TypeFlags } from 'typescript';
 
 /**
@@ -36,7 +36,7 @@ function getTypeKind({ flags }: ts.Type): TypeKind {
   if (checkFlag(flags, ts.TypeFlags.Any)) return TypeKind.Any;
   if (checkFlag(flags, ts.TypeFlags.Unknown)) return TypeKind.Unknown;
   if (checkFlag(flags, ts.TypeFlags.Never)) return TypeKind.Never;
-  if (checkFlag(flags, ts.TypeFlags.Object)) return TypeKind.Object; //@NEED TEST
+  if (checkFlag(flags, ts.TypeFlags.NonPrimitive)) return TypeKind.Object;
   else return TypeKind.Any; //@TODO: Some types are not supported yet;
 }
 
@@ -57,7 +57,7 @@ function typeRep(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): ts.Express
   const kind = getTypeKind(type);
   const literal = getLiteralField(type, typeChecker);
 
-  return compileValue({ kind, literal });
+  return encode({ kind, literal }); // hasOwnProperty
 }
 
 function isTypeParameter(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): boolean {
