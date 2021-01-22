@@ -42,18 +42,14 @@ function getLiteralField(type: ts.Type, typeChecker: ts.TypeChecker): number | b
   else return undefined;
 }
 
-function typeRep(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): object { //@TODO: Should be `TypeRep`.
-  const type = typeChecker.getTypeFromTypeNode(typeNode);
-
+function typeRep(type: ts.Type, typeChecker: ts.TypeChecker): object { //@TODO: Return type should be `TypeRep`.
   const kind = getTypeKind(type);
   const literal = getLiteralField(type, typeChecker);
 
   return { kind, ... (kind === TypeKind.Undefined || literal !== undefined) && { literal } };
 }
 
-function isTypeParameter(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): boolean {
-  const type = typeChecker.getTypeFromTypeNode(typeNode);
-
+function isTypeParameter(type: ts.Type): boolean {
   return checkFlag(type.flags, TypeFlags.TypeParameter);
 }
 
@@ -62,8 +58,9 @@ function evalTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Node 
 
   const typeChecker = program.getTypeChecker();
   const typeNode = (node.typeArguments[0] as ts.TypeNode);
+  const type = typeChecker.getTypeFromTypeNode(typeNode);
 
-  return isTypeParameter(typeNode, typeChecker) ? ts.factory.createIdentifier(`_typeRep_typeParameter_${typeNode.getText()}`) : encode(typeRep(typeNode, typeChecker));
+  return isTypeParameter(type) ? ts.factory.createIdentifier(`_typeRep_typeParameter_${typeNode.getText()}`) : encode(typeRep(type, typeChecker));
 }
 
 function isGenericFunction(node: ts.Node, program: ts.Program): node is ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction {
@@ -106,9 +103,11 @@ function isGenericFunctionCall(node: ts.Node, program: ts.Program): node is ts.C
 
 function extendGenericFunctionCall(node: ts.CallExpression, program: ts.Program): ts.Node { //@TODO: Should work with type inference
   const typeChecker = program.getTypeChecker();
-  const typeArguments = node.typeArguments ?? [];
+  const resolvedSignature = typeChecker.getResolvedSignature(node);
+  //@ts-ignore Monkey patch.
+  const typeArguments = 'target' in resolvedSignature.mapper ? [resolvedSignature.mapper.target] : resolvedSignature.mapper.targets;
 
-  for (const typeArgumentNode of typeArguments) {
+  for (const typeArgument of typeArguments) {
 
     node = ts.factory.updateCallExpression(
       node,
@@ -116,9 +115,9 @@ function extendGenericFunctionCall(node: ts.CallExpression, program: ts.Program)
       node.typeArguments,
       [
         ...node.arguments,
-        isTypeParameter(typeArgumentNode, typeChecker) ?
-          ts.factory.createIdentifier(`_typeRep_typeParameter_${typeArgumentNode.getText()}`) :
-          encode(typeRep(typeArgumentNode, typeChecker))
+        isTypeParameter(typeArgument) ?
+          ts.factory.createIdentifier(`_typeRep_typeParameter_${typeChecker.typeToString(typeArgument)}`) :
+          encode(typeRep(typeArgument, typeChecker))
       ]
     );
   }
