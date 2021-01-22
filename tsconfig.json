@@ -1,17 +1,21 @@
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "commonjs",
     "lib": ["esnext"],
-    "declaration": true,
+    "target": "ES5",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node"
   },
   "files": [
     "index.ts",
-    "transformer.ts"
+    "transformer.ts",
+    "helper.ts",
+    "typeReps.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
