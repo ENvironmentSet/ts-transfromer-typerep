@@ -63,7 +63,7 @@ function evalTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Node 
   const typeChecker = program.getTypeChecker();
   const typeNode = (node.typeArguments[0] as ts.TypeNode);
 
-  return isTypeParameter(typeNode, typeChecker) ? ts.factory.createIdentifier(typeNode.getText()) : encode(typeRep(typeNode, typeChecker));
+  return isTypeParameter(typeNode, typeChecker) ? ts.factory.createIdentifier(`_typeRep_typeParameter_${typeNode.getText()}`) : encode(typeRep(typeNode, typeChecker));
 }
 
 function isGenericFunction(node: ts.Node, program: ts.Program): node is ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction {
