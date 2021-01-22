@@ -28,6 +28,7 @@
     "index.d.ts",
     "index.js",
     "transformer.d.ts",
-    "transformer.js"
+    "transformer.js",
+    "transformer.ts"
   ]
 }
