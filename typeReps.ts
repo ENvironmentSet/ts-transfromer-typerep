@@ -20,7 +20,7 @@ export enum TypeKind {
   Union, //@TODO: variants
   Intersection, //@TODO: parts
   TemplateLiteral, //@TODO
-  Conditional, //@TODO: 전건, 후건
+  Conditional, //@TODO: antecedent, consequent
   Instance,//@TODO: 생성자, members, methods
   Tuple,
   NotSupportedYet
