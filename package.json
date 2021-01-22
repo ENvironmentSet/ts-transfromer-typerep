@@ -1,6 +1,6 @@
 {
   "name": "ts-transformer-typerep",
-  "version": "0.0.0",
+  "version": "0.0.0-1",
   "description": "Bring your type level information into value level.",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -23,12 +23,5 @@
   "homepage": "https://github.com/ENvironmentSet/ts-typeRep#readme",
   "peerDependencies": {
     "typescript": ">=3.1"
-  },
-  "files": [
-    "index.d.ts",
-    "index.js",
-    "transformer.d.ts",
-    "transformer.js",
-    "transformer.ts"
-  ]
+  }
 }
