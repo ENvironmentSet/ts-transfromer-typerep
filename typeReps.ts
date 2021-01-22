@@ -22,8 +22,7 @@ export enum TypeKind {
   TemplateLiteral, //@TODO
   Conditional, //@TODO: 전건, 후건
   Instance,//@TODO: 생성자, members, methods
-  Array,
-  Tuple//Do we really need to handle both array and tuple separately?
+  Tuple
 }
 
 interface TypeRepresentation<K extends TypeKind> { //Do we need Binding name?
