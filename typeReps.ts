@@ -22,7 +22,8 @@ export enum TypeKind {
   TemplateLiteral, //@TODO
   Conditional, //@TODO: 전건, 후건
   Instance,//@TODO: 생성자, members, methods
-  Tuple
+  Tuple,
+  NotSupportedYet
 }
 
 interface TypeRepresentation<K extends TypeKind> { //Do we need Binding name?

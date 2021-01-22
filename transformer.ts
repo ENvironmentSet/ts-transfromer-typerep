@@ -3,23 +3,14 @@ import { TypeKind } from './typeReps';
 import { encode, checkFlag } from './helper';
 import { TypeFlags } from 'typescript';
 
-/**
-function isTypeRepImport(node: ts.Node): node is ts.ImportDeclaration {
-  if (!ts.isImportDeclaration(node)) return false;
-
-  return (node.moduleSpecifier as ts.StringLiteral).text === 'ts-typeRep';
-}
- **/
-
 function isTypeRepCall(node: ts.Node, program: ts.Program): node is ts.CallExpression {
   if (!ts.isCallExpression(node)) return false;
 
   const typeChecker = program.getTypeChecker();
-  const resolvedDeclaration = typeChecker.getResolvedSignature(node)?.declaration;
+  const resolvedDeclaration = (typeChecker.getResolvedSignature(node)?.declaration as ts.SignatureDeclaration);
 
   return Boolean(
     resolvedDeclaration &&
-    !ts.isJSDocSignature(resolvedDeclaration) &&
     resolvedDeclaration?.name?.getText() === 'typeRep'
   );
 }
@@ -37,16 +28,16 @@ function getTypeKind({ flags }: ts.Type): TypeKind {
   if (checkFlag(flags, ts.TypeFlags.Unknown)) return TypeKind.Unknown;
   if (checkFlag(flags, ts.TypeFlags.Never)) return TypeKind.Never;
   if (checkFlag(flags, ts.TypeFlags.NonPrimitive)) return TypeKind.Object;
-  else return TypeKind.Any; //@TODO: Some types are not supported yet;
+  else return TypeKind.NotSupportedYet; //@TODO: Some types are not supported yet;
 }
 
 function getLiteralField(type: ts.Type, typeChecker: ts.TypeChecker): number | boolean | bigint | string | symbol | null | undefined {
-  const stringifiedType = typeChecker.typeToString(type);
+  const literal = typeChecker.typeToString(type);
 
-  if (checkFlag(type.flags, ts.TypeFlags.NumberLiteral)) return Number(stringifiedType);
-  if (checkFlag(type.flags, ts.TypeFlags.BooleanLiteral)) return Boolean(stringifiedType);
-  if (checkFlag(type.flags, ts.TypeFlags.BigIntLiteral)) return BigInt(stringifiedType);
-  if (checkFlag(type.flags, ts.TypeFlags.StringLiteral)) return String(stringifiedType).substring(1, stringifiedType.length - 1);
+  if (checkFlag(type.flags, ts.TypeFlags.NumberLiteral)) return Number(literal);
+  if (checkFlag(type.flags, ts.TypeFlags.BooleanLiteral)) return Boolean(literal);
+  if (checkFlag(type.flags, ts.TypeFlags.BigIntLiteral)) return BigInt(literal);
+  if (checkFlag(type.flags, ts.TypeFlags.StringLiteral)) return String(literal).substring(1, literal.length - 1);
   if (checkFlag(type.flags, ts.TypeFlags.Null)) return null;
   else return undefined;
 }
@@ -66,7 +57,7 @@ function isTypeParameter(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): bo
   return checkFlag(type.flags, TypeFlags.TypeParameter);
 }
 
-function handleTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Node | undefined {
+function evalTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Node | undefined {
   if (node.typeArguments?.length !== 1) return; // @TODO: somehow display error;
 
   const typeChecker = program.getTypeChecker();
@@ -74,8 +65,6 @@ function handleTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Nod
 
   return isTypeParameter(typeNode, typeChecker) ? ts.factory.createIdentifier(typeNode.getText()) : typeRep(typeNode, typeChecker);
 }
-
-//function mapTypePrameterToReal() {} // in order, <T, A, B> -> (t, a, b) -> arguments[0], arguments[1]...
 
 function isGenericFunction(node: ts.Node, program: ts.Program): node is ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction {
   if (!ts.isFunctionDeclaration(node) && !ts.isFunctionExpression(node) && !ts.isArrowFunction(node)) return false;
@@ -117,7 +106,6 @@ function isGenericFunctionCall(node: ts.Node, program: ts.Program): node is ts.C
 
 function extendGenericFunctionCall(node: ts.CallExpression, program: ts.Program): ts.Node | undefined {
   const typeChecker = program.getTypeChecker();
-  //const resolvedDeclaration = typeChecker.getResolvedSignature(node)?.declaration!;
   const typeArguments = node.typeArguments ?? [];
 
   for (const typeArgumentNode of typeArguments) {
@@ -130,7 +118,7 @@ function extendGenericFunctionCall(node: ts.CallExpression, program: ts.Program)
 function transformNode(node: ts.SourceFile, program: ts.Program): ts.SourceFile;
 function transformNode(node: ts.Node, program: ts.Program): ts.Node | undefined;
 function transformNode(node: ts.Node, program: ts.Program): ts.Node | undefined {
-  if (isTypeRepCall(node, program)) return handleTypeRepCall(node, program);
+  if (isTypeRepCall(node, program)) return evalTypeRepCall(node, program);
   if (isGenericFunction(node, program)) return extendGenericFunction(node, program);
   if (isGenericFunctionCall(node, program)) return extendGenericFunctionCall(node, program);
   else return node;
