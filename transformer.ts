@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
-import { TypeKind } from './typeReps';
-import { encode, checkFlag } from './helper';
 import { TypeFlags } from 'typescript';
+import { TypeKind } from './typeReps';
+import { checkFlag, encode } from './helper';
 
 function isTypeRepCall(node: ts.Node, program: ts.Program): node is ts.CallExpression {
   if (!ts.isCallExpression(node)) return false;
@@ -42,13 +42,13 @@ function getLiteralField(type: ts.Type, typeChecker: ts.TypeChecker): number | b
   else return undefined;
 }
 
-function typeRep(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): ts.Expression {
+function typeRep(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): object { //@TODO: Should be `TypeRep`.
   const type = typeChecker.getTypeFromTypeNode(typeNode);
 
   const kind = getTypeKind(type);
   const literal = getLiteralField(type, typeChecker);
 
-  return encode({ kind, literal }); // hasOwnProperty
+  return { kind, ... (kind === TypeKind.Undefined || literal !== undefined) && { literal } };
 }
 
 function isTypeParameter(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): boolean {
@@ -58,12 +58,12 @@ function isTypeParameter(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker): bo
 }
 
 function evalTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Node | undefined {
-  if (node.typeArguments?.length !== 1) return; // @TODO: somehow display error;
+  if (node.typeArguments?.length !== 1) return; // @TODO: display error
 
   const typeChecker = program.getTypeChecker();
   const typeNode = (node.typeArguments[0] as ts.TypeNode);
 
-  return isTypeParameter(typeNode, typeChecker) ? ts.factory.createIdentifier(typeNode.getText()) : typeRep(typeNode, typeChecker);
+  return isTypeParameter(typeNode, typeChecker) ? ts.factory.createIdentifier(typeNode.getText()) : encode(typeRep(typeNode, typeChecker));
 }
 
 function isGenericFunction(node: ts.Node, program: ts.Program): node is ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction {
@@ -81,7 +81,8 @@ function extendGenericFunction(node: ts.FunctionDeclaration | ts.FunctionExpress
   const typeParams = (typeChecker.getSignatureFromDeclaration(node)?.declaration as ts.SignatureDeclaration)?.typeParameters!;
 
   for (const typeParam of typeParams) {
-    const realParam = ts.factory.createParameterDeclaration(undefined, undefined, undefined, typeParam.name); //@TODO: prevent identifier collision.
+    const uniqueName = `_typeRep_typeParameter_${typeParam.name.text}`;
+    const realParam = ts.factory.createParameterDeclaration(undefined, undefined, undefined, uniqueName);
 
     if (ts.isFunctionDeclaration(node)) node = ts.factory.updateFunctionDeclaration(node, node.decorators, node.modifiers, node.asteriskToken, node.name, node.typeParameters, [...node.parameters, realParam], node.type, node.body);
     else if (ts.isFunctionExpression(node)) node = ts.factory.updateFunctionExpression(node, node.modifiers, node.asteriskToken, node.name, node.typeParameters, [...node.parameters, realParam], node.type, node.body);
@@ -99,17 +100,27 @@ function isGenericFunctionCall(node: ts.Node, program: ts.Program): node is ts.C
 
   return Boolean(
     resolvedDeclaration &&
-    !ts.isJSDocSignature(resolvedDeclaration) &&
     (resolvedDeclaration.typeParameters?.length ?? 0) > 0
   );
 }
 
-function extendGenericFunctionCall(node: ts.CallExpression, program: ts.Program): ts.Node | undefined {
+function extendGenericFunctionCall(node: ts.CallExpression, program: ts.Program): ts.Node { //@TODO: Should work with type inference
   const typeChecker = program.getTypeChecker();
   const typeArguments = node.typeArguments ?? [];
 
   for (const typeArgumentNode of typeArguments) {
-    node = ts.factory.updateCallExpression(node, node.expression, node.typeArguments, [...node.arguments, isTypeParameter(typeArgumentNode, typeChecker) ? ts.factory.createIdentifier(typeArgumentNode.getText()) : typeRep(typeArgumentNode, typeChecker)]);
+
+    node = ts.factory.updateCallExpression(
+      node,
+      node.expression,
+      node.typeArguments,
+      [
+        ...node.arguments,
+        isTypeParameter(typeArgumentNode, typeChecker) ?
+          ts.factory.createIdentifier(`_typeRep_typeParameter_${typeArgumentNode.getText()}`) :
+          encode(typeRep(typeArgumentNode, typeChecker))
+      ]
+    );
   }
 
   return node;
