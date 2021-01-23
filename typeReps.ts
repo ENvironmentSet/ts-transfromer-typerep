@@ -1,5 +1,5 @@
 export type TypeRep = NumberRep | BooleanRep | BigIntRep | StringRep | SymbolRep | NullRep | UndefinedRep
-  | VoidRep | AnyRep | UnknownRep | NeverRep | ObjectRep;
+  | VoidRep | AnyRep | UnknownRep | NeverRep | NonPrimitiveRep;
 
 export enum TypeKind {
   Any,
@@ -8,20 +8,19 @@ export enum TypeKind {
   String,
   Symbol,
   BigInt,
-  Object, // Represents `object` type. It's not for both `Object` nor `{}`.
+  NonPrimitive, // Represents `object` type. It's not for both `Object` nor `{}`.
   Null,
   Undefined,
   Unknown,
   Never,
   Void,
   Enum,
-  Interface,
+  Object,
   Function,
   Union, //@TODO: variants
   Intersection, //@TODO: parts
   TemplateLiteral, //@TODO
   Conditional, //@TODO: antecedent, consequent
-  Instance,//@TODO: 생성자, members, methods
   Tuple,
   NotSupportedYet
 }
@@ -60,4 +59,4 @@ export type AnyRep = TypeRepresentation<TypeKind.Any>;
 export type UnknownRep = TypeRepresentation<TypeKind.Unknown>;
 export type NeverRep = TypeRepresentation<TypeKind.Never>;
 
-export type ObjectRep = TypeRepresentation<TypeKind.Object>;
+export type NonPrimitiveRep = TypeRepresentation<TypeKind.NonPrimitive>;

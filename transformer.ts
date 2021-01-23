@@ -24,7 +24,7 @@ function getTypeKind({ flags }: ts.Type): TypeKind {
   if (checkFlag(flags, ts.TypeFlags.Any)) return TypeKind.Any;
   if (checkFlag(flags, ts.TypeFlags.Unknown)) return TypeKind.Unknown;
   if (checkFlag(flags, ts.TypeFlags.Never)) return TypeKind.Never;
-  if (checkFlag(flags, ts.TypeFlags.NonPrimitive)) return TypeKind.Object;
+  if (checkFlag(flags, ts.TypeFlags.NonPrimitive)) return TypeKind.NonPrimitive;
   else return TypeKind.NotSupportedYet; //@TODO: Some types are not supported yet;
 }
 
@@ -50,7 +50,7 @@ function isTypeParameter(type: ts.Type): boolean {
   return checkFlag(type.flags, TypeFlags.TypeParameter);
 }
 
-function evalTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Node | undefined {
+function evalTypeRepCall(node: ts.CallExpression, program: ts.Program): ts.Expression | undefined {
   if (node.typeArguments?.length !== 1) return; // @TODO: display error
 
   const typeChecker = program.getTypeChecker();
@@ -112,9 +112,14 @@ function extendGenericFunctionCall(node: ts.CallExpression, program: ts.Program)
       node.typeArguments,
       [
         ...node.arguments,
-        isTypeParameter(typeArgument) ?
-          ts.factory.createIdentifier(`_typeRep_typeParameter_${typeChecker.typeToString(typeArgument)}`) :
-          encode(typeRep(typeArgument, typeChecker))
+        evalTypeRepCall(
+          ts.factory.createCallExpression(
+            ts.factory.createIdentifier('typeRep'),
+            [typeChecker.typeToTypeNode(typeArgument, undefined, undefined)!],
+            [],
+          ),
+          program
+        )!
       ]
     );
   }
