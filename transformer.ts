@@ -7,12 +7,9 @@ function isTypeRepCall(node: ts.Node, program: ts.Program): node is ts.CallExpre
   if (!ts.isCallExpression(node)) return false;
 
   const typeChecker = program.getTypeChecker();
-  const resolvedDeclaration = (typeChecker.getResolvedSignature(node)?.declaration as ts.SignatureDeclaration);
+  const resolvedSignature = typeChecker.getResolvedSignature(node);
 
-  return Boolean(
-    resolvedDeclaration &&
-    resolvedDeclaration?.name?.getText() === 'typeRep'
-  );
+  return (resolvedSignature?.declaration as ts.SignatureDeclaration)?.name?.getText() === 'typeRep';
 }
 
 function getTypeKind({ flags }: ts.Type): TypeKind {
