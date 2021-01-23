@@ -1,15 +1,15 @@
 import * as ts from 'typescript';
 
 function encodeObject(object: object): ts.ObjectLiteralExpression {
-  function compileEntries([entry, ...rest]: [string, unknown][]): ts.ObjectLiteralElementLike[] {
+  function encodeEntries([entry, ...rest]: [string, unknown][]): ts.ObjectLiteralElementLike[] {
     if (!entry) return [];
     else return [
-      ...compileEntries(rest),
+      ...encodeEntries(rest),
       ts.factory.createPropertyAssignment(entry[0], encode(entry[1]))
     ];
   }
 
-  return ts.factory.createObjectLiteralExpression(compileEntries(Object.entries(object)));
+  return ts.factory.createObjectLiteralExpression(encodeEntries(Object.entries(object)));
 }
 
 function encodeSymbol({ description }: symbol): ts.CallExpression {
