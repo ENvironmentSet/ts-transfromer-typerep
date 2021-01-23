@@ -9,11 +9,8 @@
     "noImplicitReturns": true,
     "moduleResolution": "node"
   },
-  "files": [
-    "index.ts",
-    "transformer.ts",
-    "helper.ts",
-    "typeReps.ts"
+  "include": [
+    "**/*.ts"
   ],
   "exclude": [
     "node_modules"
