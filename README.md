@@ -38,7 +38,7 @@ For more information about type representations, please check type definition of
 ### Type `TypeKind`
 
 `TypeKind` is type of value for discriminating type representations.
-Difference type representations are distinguished by it's `kind` field, whose value is `TypeKind`.
+Different type representations are distinguished by it's `kind` field, whose value is `TypeKind`.
 For more information about type representations, please check type definition of `TypeKind`.
 
 ```typescript
