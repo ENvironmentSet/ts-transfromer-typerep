@@ -1,6 +1,6 @@
 {
   "name": "ts-transformer-typerep",
-  "version": "0.0.0-3",
+  "version": "0.0.0-4",
   "description": "Bring your type level information into value level.",
   "main": "index.js",
   "typings": "index.d.ts",
