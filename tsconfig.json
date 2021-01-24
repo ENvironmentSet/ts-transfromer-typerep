@@ -4,6 +4,7 @@
     "lib": ["esnext"],
     "target": "ES5",
     "strict": true,
+    "declaration": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,

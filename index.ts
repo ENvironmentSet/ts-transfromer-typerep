@@ -1,4 +1,7 @@
-import { TypeRep } from './typeReps';
+import { TypeRep } from './typeRep';
 
 export declare function typeRep<T>(): TypeRep;
-export * from './typeReps';
+export {
+  TypeKind, TypeRep, NumberRep, BooleanRep, BigIntRep, StringRep, SymbolRep, NullRep, UndefinedRep,
+  VoidRep, AnyRep, UnknownRep, NeverRep, NonPrimitiveRep, UnionRep, IntersectionRep
+} from './typeRep';
