@@ -77,11 +77,8 @@ typeRep<10>();
 | `never`/`unknown`/`any`/`void` | ✅ |
 | Polymorphic types | 🚧(Single type variable such as `T`, `A` only. can't consume complex types like `Array<T>` yet.) |
 | Enums | 📝 |
-| Interfaces | 📝 |
 | Function/Constructor types | 📝 |
-| Union types | 📝 |
-| Intersection types | 📝 |
+| Union types | ✅ |
+| Intersection types | ✅ |
 | Template literal types | 📝 |
-| Conditional types | 📝 |
-| Tuple types | 📝 |
-| Class/Instance types | 📝 |
+| Object types | 📝 |
