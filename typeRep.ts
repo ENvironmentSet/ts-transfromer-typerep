@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 import { checkFlag, encode, isPolymorphicType } from './helper';
 
 export type TypeRep = NumberRep | BooleanRep | BigIntRep | StringRep | SymbolRep | NullRep | UndefinedRep
-  | VoidRep | AnyRep | UnknownRep | NeverRep | NonPrimitiveRep | UnionRep | IntersectionRep;
+  | VoidRep | AnyRep | UnknownRep | NeverRep | NonPrimitiveRep | UnionRep | IntersectionRep | ObjectRep;
 
 export enum TypeKind { //@TODO: Categorize Better & Provide more information through representation.
   Any,
@@ -52,7 +52,9 @@ export type UnknownRep = TypeRepresentation<TypeKind.Unknown>;
 export type NeverRep = TypeRepresentation<TypeKind.Never>;
 
 export type NonPrimitiveRep = TypeRepresentation<TypeKind.NonPrimitive>;
-
+export interface ObjectRep extends TypeRepresentation<TypeKind.Object> {
+  properties: [string, TypeRep][];
+}
 export interface UnionRep extends TypeRepresentation<TypeKind.Union> {
   parts: TypeRep[];
 }
@@ -96,10 +98,16 @@ function getParts(type: ts.Type, typeChecker: ts.TypeChecker): TypeRep[] | undef
   else return undefined;
 }
 
+function getProperties(type: ts.Type, typeChecker: ts.TypeChecker): [string, TypeRep][] | undefined {
+  if (checkFlag(type.flags, ts.TypeFlags.Object)) return typeChecker.getPropertiesOfType(type).map(symbol => [typeChecker.symbolToString(symbol), monomorphicTypeRep(typeChecker.getDeclaredTypeOfSymbol(symbol), typeChecker)]);
+  else return undefined;
+}
+
 export function monomorphicTypeRep(type: ts.Type, typeChecker: ts.TypeChecker): TypeRep {
   return ({
     kind: getTypeKind(type),
     literal: getLiteralField(type, typeChecker),
+    properties: getProperties(type, typeChecker),
     parts: getParts(type, typeChecker)
   }) as TypeRep;
 }
