@@ -1,19 +1,18 @@
 # ts-transformer-typerep
 
-A typescript custom transformer which enables to pull down type-level(compile time) information into value level(runtime).
+A typescript custom transformer which enables a programmer to pull down type-level(compile time) information into value level(runtime).
 
 ```typescript
 import { typeRep, TypeKind } from 'ts-transformer-typerep';
 
-function add<A extends number, B extends number>(): number {
-  const a = typeRep<A>();
-  const b = typeRep<B>();
+function keys<T>(): string[] {
+  const type = typeRep<T>();
 
-  if (a.kind === TypeKind.Number && b.kind === TypeKind.Number) return (a.literal ?? 0) + (b.literal ?? 0);
-  else throw new Error('impossible situation');
+  if (type.kind === TypeKind.Object) return type.properties.map(([key]) => key);
+  else return [];
 }
 
-add<1, 2>(); // 3
+keys<{ x: 1, y: 2, z: 3 }>(); // ['x', 'y', 'z']
 ```
 
 > **WARNING⚠️**: This transformer is on construction. It's not recommended to use this on production.
@@ -24,7 +23,7 @@ add<1, 2>(); // 3
 npm i -D ts-transformer-typerep
 ```
 
-[See here](https://github.com/madou/typescript-transformer-handbook#consuming-transformers) to learn how to apply custom transformer.
+[See here](https://github.com/madou/typescript-transformer-handbook#consuming-transformers) to learn how to apply custom transformers.
 
 ## Reference
 
@@ -32,13 +31,13 @@ npm i -D ts-transformer-typerep
 
 ### Type `TypeRep`
 
-Type representations are value that represents types. `TypeRep` is type of every type representation.
+Type representations are values that represent types. `TypeRep` is type of every type representation.
 For more information about type representations, please check type definition of `TypeRep`.
 
 ### Type `TypeKind`
 
 `TypeKind` is type of value for discriminating type representations.
-Different type representations are distinguished by it's `kind` field, whose value is `TypeKind`.
+Different type representations are distinguished by its `kind` field, whose value is value of `TypeKind`.
 For more information about type representations, please check type definition of `TypeKind`.
 
 ```typescript
@@ -50,7 +49,7 @@ else console.log('It\'s not a number type :(');
 
 ### Function `typeRep<typeToPullDown>(): TypeRep`
 
-`typeRep` is a function for pulling type level information into value level. It returns value-level representation of given type.
+`typeRep` is a function for pulling type level information into value level. It returns value-level representation of a given type.
 
 ```typescript
 typeRep<10>();
@@ -66,19 +65,19 @@ typeRep<10>();
 
 #### Type Support Table
 
-- Available(✅): Type is fully supported
-- WIP(🚧): Type is partially supported
-- Todo(📝): Type is planned to be supported
+- Available(✅): A type is fully supported
+- WIP(🚧): A type is partially supported
+- Todo(📝): A type is planned to be supported
 
 | Types | Current State |
 |---------|---------------|
 | Primitive types | ✅ |
 | Literal types | ✅ |
 | `never`/`unknown`/`any`/`void` | ✅ |
-| Polymorphic types | 🚧(Single type variable such as `T`, `A` only. can't consume complex types like `Array<T>` yet.) |
+| Polymorphic types | 🚧(Single type variable such as `T`, `A` only) |
 | Enums | 📝 |
 | Function/Constructor types | 📝 |
 | Union types | ✅ |
 | Intersection types | ✅ |
 | Template literal types | 📝 |
-| Object types | 📝 |
+| Object types | 🚧(experimentally supported) |
