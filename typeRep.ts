@@ -11,15 +11,18 @@ export enum TypeKind { //@TODO: Categorize Better & Provide more information thr
   String,
   Symbol,
   BigInt,
-  NonPrimitive,
   Null,
   Undefined,
+  NonPrimitive,
   Unknown,
   Never,
   Void,
   Enum, //@TODO
+  This,
   Object, //@TODO
   Function, //@TODO
+  Array,
+  Tuple,
   Union,
   Intersection,
   TemplateLiteral, //@TODO
@@ -62,7 +65,11 @@ export interface IntersectionRep extends TypeRepresentation<TypeKind.Intersectio
   parts: TypeRep[];
 }
 
-function getTypeKind({ flags }: ts.Type): TypeKind {
+function getTypeKind(type: ts.Type): TypeKind {
+  const flags = type.flags;
+
+  if (type.isUnion()) return TypeKind.Union;
+  if (type.isIntersection()) return TypeKind.Intersection;
   if (checkFlag(flags, ts.TypeFlags.Number) || checkFlag(flags, ts.TypeFlags.NumberLiteral)) return TypeKind.Number;
   if (checkFlag(flags, ts.TypeFlags.Boolean) || checkFlag(flags, ts.TypeFlags.BooleanLiteral)) return TypeKind.Boolean;
   if (checkFlag(flags, ts.TypeFlags.BigInt) || checkFlag(flags, ts.TypeFlags.BigIntLiteral)) return TypeKind.BigInt;
@@ -74,8 +81,6 @@ function getTypeKind({ flags }: ts.Type): TypeKind {
   if (checkFlag(flags, ts.TypeFlags.Unknown)) return TypeKind.Unknown;
   if (checkFlag(flags, ts.TypeFlags.Never)) return TypeKind.Never;
   if (checkFlag(flags, ts.TypeFlags.Object)) return TypeKind.Object;
-  if (checkFlag(flags, ts.TypeFlags.Union)) return TypeKind.Union;
-  if (checkFlag(flags, ts.TypeFlags.Intersection)) return TypeKind.Intersection;
   if (checkFlag(flags, ts.TypeFlags.NonPrimitive)) return TypeKind.NonPrimitive;
   else return TypeKind.Any;
 }
