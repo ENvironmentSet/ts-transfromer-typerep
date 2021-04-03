@@ -14,9 +14,7 @@ export function isGenericFunctionCall(node: ts.Node, typeChecker: ts.TypeChecker
 }
 
 export function extendGenericFunctionCall(node: ts.CallExpression, typeChecker: ts.TypeChecker): ts.Node { //@TODO: Should work with type inference
-  const resolvedSignature = typeChecker.getResolvedSignature(node);
-  //@ts-ignore @FIXME Monkey patch.
-  const typeArguments = 'target' in resolvedSignature.mapper ? [resolvedSignature.mapper.target] : resolvedSignature.mapper.targets;
+  const typeArguments = node.typeArguments?.map(typeNode => typeChecker.getTypeFromTypeNode(typeNode)) ?? [];
 
   for (const typeArgument of typeArguments) {
 
