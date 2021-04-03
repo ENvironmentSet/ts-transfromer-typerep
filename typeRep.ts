@@ -78,10 +78,10 @@ function getTypeKind(type: ts.Type): TypeKind {
   if (checkFlag(flags, ts.TypeFlags.Null)) return TypeKind.Null;
   if (checkFlag(flags, ts.TypeFlags.Undefined)) return TypeKind.Undefined;
   if (checkFlag(flags, ts.TypeFlags.Void)) return TypeKind.Void;
-  if (checkFlag(flags, ts.TypeFlags.Unknown)) return TypeKind.Unknown;
   if (checkFlag(flags, ts.TypeFlags.Never)) return TypeKind.Never;
   if (checkFlag(flags, ts.TypeFlags.Object)) return TypeKind.Object;
   if (checkFlag(flags, ts.TypeFlags.NonPrimitive)) return TypeKind.NonPrimitive;
+  if (checkFlag(flags, ts.TypeFlags.Unknown)) return TypeKind.Unknown;
   else return TypeKind.Any;
 }
 
