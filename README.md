@@ -80,4 +80,4 @@ typeRep<10>();
 | Union types | ✅ |
 | Intersection types | ✅ |
 | Template literal types | 📝 |
-| Object types | 🚧(experimentally supported) |
+| Object types | 🚧(Only owned properties are extracted) |
