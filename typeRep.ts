@@ -26,6 +26,7 @@ export enum TypeKind { //@TODO: Categorize Better & Provide more information thr
   Union,
   Intersection,
   TemplateLiteral, //@TODO
+  Class, //@TODO
 }
 
 interface TypeRepresentation<K extends TypeKind> {
@@ -65,6 +66,11 @@ export interface IntersectionRep extends TypeRepresentation<TypeKind.Intersectio
   parts: TypeRep[];
 }
 
+export interface FunctionRep extends TypeRepresentation<TypeKind.Function> { //@TODO Support Type Parameter
+  parameters: TypeRep[];
+  returnType: TypeRep;
+}
+
 function getTypeKind(type: ts.Type): TypeKind {
   const flags = type.flags;
 
@@ -79,7 +85,10 @@ function getTypeKind(type: ts.Type): TypeKind {
   if (checkFlag(flags, ts.TypeFlags.Undefined)) return TypeKind.Undefined;
   if (checkFlag(flags, ts.TypeFlags.Void)) return TypeKind.Void;
   if (checkFlag(flags, ts.TypeFlags.Never)) return TypeKind.Never;
-  if (checkFlag(flags, ts.TypeFlags.Object)) return TypeKind.Object;
+  if (checkFlag(flags, ts.TypeFlags.Object)) {
+    if (type.getCallSignatures().length !== 0) return TypeKind.Function;
+    else return TypeKind.Object
+  }
   if (checkFlag(flags, ts.TypeFlags.NonPrimitive)) return TypeKind.NonPrimitive;
   if (checkFlag(flags, ts.TypeFlags.Unknown)) return TypeKind.Unknown;
   else return TypeKind.Any;
@@ -104,8 +113,35 @@ function getParts(type: ts.Type, typeChecker: ts.TypeChecker): TypeRep[] | undef
 }
 
 function getProperties(type: ts.Type, typeChecker: ts.TypeChecker): [string, TypeRep][] | undefined {
-  if (checkFlag(type.flags, ts.TypeFlags.Object)) return typeChecker.getPropertiesOfType(type).map(symbol => [typeChecker.symbolToString(symbol), monomorphicTypeRep(typeChecker.getDeclaredTypeOfSymbol(symbol), typeChecker)]);
+  const declaration = type.symbol?.declarations;
+
+  if (checkFlag(type.flags, ts.TypeFlags.Object) && declaration) return typeChecker.getPropertiesOfType(type).map(symbol => [typeChecker.symbolToString(symbol), monomorphicTypeRep(typeChecker.getTypeOfSymbolAtLocation(symbol, declaration[0]), typeChecker)]);
   else return undefined;
+}
+
+function getParameters(type: ts.Type, typeChecker: ts.TypeChecker): TypeRep[] {
+  if (checkFlag(type.flags, ts.TypeFlags.Object) && type.getCallSignatures().length !== 0) {
+    const signature = typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call)[0];
+    const signatureDeclaration = signature.getDeclaration();
+
+    return signature.getParameters().map(symbol => {
+      const type = typeChecker.getTypeOfSymbolAtLocation(symbol, signatureDeclaration);
+
+      return monomorphicTypeRep(type, typeChecker);
+    });
+  }
+
+  return [];
+}
+
+function getReturnType(type: ts.Type, typeChecker: ts.TypeChecker): TypeRep | undefined {
+  if (checkFlag(type.flags, ts.TypeFlags.Object) && type.getCallSignatures().length !== 0) {
+    const signature = typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call)[0];
+
+    return monomorphicTypeRep(typeChecker.getReturnTypeOfSignature(signature), typeChecker);
+  }
+
+  return undefined;
 }
 
 export function monomorphicTypeRep(type: ts.Type, typeChecker: ts.TypeChecker): TypeRep {
@@ -113,7 +149,9 @@ export function monomorphicTypeRep(type: ts.Type, typeChecker: ts.TypeChecker): 
     kind: getTypeKind(type),
     literal: getLiteralField(type, typeChecker),
     properties: getProperties(type, typeChecker),
-    parts: getParts(type, typeChecker)
+    parts: getParts(type, typeChecker),
+    parameters: getParameters(type, typeChecker),
+    returnType: getReturnType(type, typeChecker)
   }) as TypeRep;
 }
 
@@ -121,7 +159,8 @@ export function monomorphicTypeRep(type: ts.Type, typeChecker: ts.TypeChecker): 
 //Encode support for function -> typeRep returns TypeRep.
 //@TODO
 export function polymorphicTypeRep(type: ts.Type, typeChecker: ts.TypeChecker): ts.Expression {
-  return ts.factory.createIdentifier(`_typeRep_typeParameter_${typeChecker.typeToString(type)}`);
+  if (type.isTypeParameter()) return ts.factory.createIdentifier(`_typeRep_typeParameter_${typeChecker.typeToString(type)}`);
+  else return ts.factory.createVoidZero(); // make error
 }
 
 export function typeRep(type: ts.Type, typeChecker: ts.TypeChecker): ts.Expression {

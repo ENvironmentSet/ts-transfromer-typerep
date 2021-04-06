@@ -29,7 +29,7 @@ export function encode(value: unknown): ts.Expression {
     case 'bigint': return ts.factory.createBigIntLiteral(`${value}n`);
     case 'object': return value === null ? ts.factory.createNull() : Array.isArray(value) ? ts.factory.createArrayLiteralExpression(value.map(encode)) : encodeObject(value);
     case 'symbol': return encodeSymbol(value);
-    default: return encode(undefined); //@TODO: Converting Function are not supported yet
+    default: return encode(undefined); //Converting functions to code is not supported yet.
   }
 }
 
@@ -37,11 +37,12 @@ export function checkFlag(target: number, flag: number): boolean {
   return (target & flag) === flag;
 }
 
-function isTypeReference(type: ts.Type): type is ts.TypeReference {
+export function isTypeReference(type: ts.Type): type is ts.TypeReference {
   return 'target' in type;
 }
 
 export function isPolymorphicType(type: ts.Type, typeChecker: ts.TypeChecker): boolean {
-  if (checkFlag(type.flags, ts.TypeFlags.TypeParameter)) return true;
+  if (type.isTypeParameter()) return true;
+  //@TODO collect type expression with type parameter
   else return isTypeReference(type) && typeChecker.getTypeArguments(type).some(typeArgument => isPolymorphicType(typeArgument, typeChecker));
 }

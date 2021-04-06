@@ -108,8 +108,8 @@ typeRep<10>();
 | `never`/`unknown`/`any`/`void` | ✅ |
 | Polymorphic types | 🚧(Single type variable such as `T`, `A` only) |
 | Enums | 📝 |
-| Function/Constructor types | 📝 |
+| Function types | ✅ |
 | Union types | ✅ |
 | Intersection types | ✅ |
 | Template literal types | 📝 |
-| Object types | 🚧(Only owned properties are extracted) |
+| Object types | ✅ |
