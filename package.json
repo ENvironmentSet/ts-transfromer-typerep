@@ -21,7 +21,7 @@
     "url": "https://github.com/ENvironmentSet/ts-typeRep/issues"
   },
   "homepage": "https://github.com/ENvironmentSet/ts-typeRep#readme",
-  "peerDependencies": {
-    "typescript": ">=3.1"
+  "devDependencies": {
+    "typescript": "^4.8.3"
   }
 }

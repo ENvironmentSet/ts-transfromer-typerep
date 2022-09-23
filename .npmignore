@@ -2,3 +2,4 @@ examples
 .gitignore
 .tsconfig
 .idea
+node_modules
