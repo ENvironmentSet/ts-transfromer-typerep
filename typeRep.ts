@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { checkFlag, encode, isPolymorphicType } from './helper';
+import { checkFlag, encode, isPolymorphicType } from './helper.js';
 
 export type TypeRep = NumberRep | BooleanRep | BigIntRep | StringRep | SymbolRep | NullRep | UndefinedRep
   | VoidRep | AnyRep | UnknownRep | NeverRep | NonPrimitiveRep | UnionRep | IntersectionRep | ObjectRep;

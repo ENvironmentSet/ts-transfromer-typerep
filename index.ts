@@ -1,4 +1,4 @@
-import { TypeRep } from './typeRep';
+import { TypeRep } from './typeRep.js';
 
 export declare function typeRep<T>(): TypeRep;
 export {

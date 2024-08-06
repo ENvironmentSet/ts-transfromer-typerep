@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
-import { isTypeRepCall, evalTypeRepCall } from './typeRepTransformer';
-import { isGenericFunction, extendGenericFunction } from './genericFunctionTransformer';
-import { isGenericFunctionCall, extendGenericFunctionCall } from './genericFunctionCallTransformer';
+import { isTypeRepCall, evalTypeRepCall } from './typeRepTransformer.js';
+import { isGenericFunction, extendGenericFunction } from './genericFunctionTransformer.js';
+import { isGenericFunctionCall, extendGenericFunctionCall } from './genericFunctionCallTransformer.js';
 
 function transformNode(node: ts.SourceFile, program: ts.Program): ts.SourceFile;
 function transformNode(node: ts.Node, program: ts.Program): ts.Node | undefined;
