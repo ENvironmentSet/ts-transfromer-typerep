@@ -23,7 +23,7 @@ keys<{ x: 1, y: 2, z: 3 }>(); // ['x', 'y', 'z']
 npm i -D ts-transformer-typerep
 ```
 
-[Check here](https://github.com/madou/typescript-transformer-handbook#consuming-transformers) to learn how to apply custom transformers.
+[Check here](https://github.com/madou/typescript-transformer-handbook#consuming-transformers) and [here](https://github.com/nonara/ts-patch?tab=readme-ov-file#configuration) to learn how to apply custom transformers.
 
 ## Reference
 
