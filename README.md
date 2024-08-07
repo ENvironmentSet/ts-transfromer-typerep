@@ -32,22 +32,23 @@ npm i -D ts-transformer-typerep
 Type representations are values that represent types. `TypeRep` is type of all type representation.
 Since typescript types can be classified in several groups, type representations are classified in groups, too.
 
-| Type | Type Representation |
-|------|---------------------|
-| `any` | `AnyRep`(`{ kind: TypeKind.Any }`) |
-| `number` and its subtypes | `NumberRep`(`{ kind: TypeKind.Number, literal: number }`) |
-| `boolean` and its subtypes | `BooleanRep`(`{ kind: TypeKind.Boolean, literal: boolean }`) |
-| `string` and its subtypes | `StringRep`(`{ kind: TypeKind.String, literal: string }`) |
-| `symbol` | `SymbolRep`(`{ kind: TypeKind.Symbol }`) |
-| `bigint` and its subtypes | `BigIntRep`(`{ kind: TypeKind.BigInt, literal: bigint }`) |
-| `null` | `NullRep`(`{ kind: TypeKind.null }`) |
-| `undefined` | `UndefinedRep`(`{ kind: TypeKind.Undefined }`) |
-| `object` | `NonPrimitiveRep`((`{ kind: TypeKind.NonPrimitive }`) |
-| `unknown` | `UnknownRep`(`{ kind: TypeKind.Unknown }`) |
-| `never` | `NeverRep`(`{ kind: TypeKind.Never }`) |
-| `void` | `VoidRep`(`{ kind: TypeKind.Void }`) |
-| Any type constructed with Union operator but not `never` | `UnionRep`(`{ kind: TypeKind.Union, parts: TypeRep[] }`) |
-| Any type constructed with Intersection operator | `IntersectionRep`(`{ kind: TypeKind.Intersection, parts: TypeRep[] }`) |
+| Type | Type Representation                                                                      |
+|------|------------------------------------------------------------------------------------------|
+| `any` | `AnyRep`(`{ kind: TypeKind.Any }`)                                                       |
+| `number` and its subtypes | `NumberRep`(`{ kind: TypeKind.Number, literal: number }`)                                |
+| `boolean` and its subtypes | `BooleanRep`(`{ kind: TypeKind.Boolean, literal: boolean }`)                             |
+| `string` and its subtypes | `StringRep`(`{ kind: TypeKind.String, literal: string }`)                                |
+| `symbol` | `SymbolRep`(`{ kind: TypeKind.Symbol }`)                                                 |
+| `bigint` and its subtypes | `BigIntRep`(`{ kind: TypeKind.BigInt, literal: bigint }`)                                |
+| `null` | `NullRep`(`{ kind: TypeKind.null }`)                                                     |
+| `undefined` | `UndefinedRep`(`{ kind: TypeKind.Undefined }`)                                           |
+| `object` | `NonPrimitiveRep`((`{ kind: TypeKind.NonPrimitive }`)                                    |
+| `unknown` | `UnknownRep`(`{ kind: TypeKind.Unknown }`)                                               |
+| `never` | `NeverRep`(`{ kind: TypeKind.Never }`)                                                   |
+| `void` | `VoidRep`(`{ kind: TypeKind.Void }`)                                                     |
+| Any type constructed with Union operator but not `never` | `UnionRep`(`{ kind: TypeKind.Union, parts: TypeRep[] }`)                                 |
+| Any type constructed with Intersection operator | `IntersectionRep`(`{ kind: TypeKind.Intersection, parts: TypeRep[] }`)                   |
+| Any object type with call signautre | `FunctionRep`(`{ kind: TypeKind.Function, parameters: TypeRep[], returnType: TypeRep }`) |
 
 ### Type `TypeKind`
 
@@ -78,6 +79,7 @@ else console.log('It\'s not a number type :(');
 | Any type constructed with Union operator but not `never` | `Union` |
 | Any type constructed with Intersection operator | `Intersection` |
 | `Object` | `Object` |
+| Any object type with call signature | `Function` |
 
 ### Function `typeRep<typeToPullDown>(): TypeRep`
 
