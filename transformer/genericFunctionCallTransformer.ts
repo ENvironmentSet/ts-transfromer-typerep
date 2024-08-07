@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { typeRep } from '../typeRep.js';
+import { typeRep } from './typeRepTransformer.js';
 
 export function isGenericFunctionCall(node: ts.Node, typeChecker: ts.TypeChecker): node is ts.CallExpression {
   if (!ts.isCallExpression(node)) return false;
